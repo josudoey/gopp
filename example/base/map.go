@@ -1,16 +1,20 @@
+//ref https://tour.golang.org/moretypes/22
 package main
 
-//ref https://blog.golang.org/go-maps-in-action
 import "fmt"
 
 func main() {
-	var m = make(map[string]string)
-	m = map[string]string{
-		"hello": "world",
-	}
-	n := len(m)
-	fmt.Println("map len =", n)
-	for key, value := range m {
-		fmt.Println("Key:", key, "Value:", value)
-	}
+	m := make(map[string]int)
+
+	m["Answer"] = 42
+	fmt.Println("The value:", m["Answer"])
+
+	m["Answer"] = 48
+	fmt.Println("The value:", m["Answer"])
+
+	delete(m, "Answer")
+	fmt.Println("The value:", m["Answer"])
+
+	v, ok := m["Answer"]
+	fmt.Println("The value:", v, "Present?", ok)
 }
