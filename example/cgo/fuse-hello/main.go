@@ -3,7 +3,7 @@ package main
 // #cgo CFLAGS: -D_FILE_OFFSET_BITS=64 -I/usr/include/fuse  -pthread
 // #cgo LDFLAGS: -lfuse
 //
-// #include "hello.h"
+// #include "helloMount.h"
 import "C"
 import "flag"
 import "log"
