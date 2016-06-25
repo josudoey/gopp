@@ -4,7 +4,7 @@ import (
 	"./"
 )
 
-func Example() {
+func ExampleHello() {
 	example.Hello()
 	// Output:
 	// Hello, 世界
@@ -13,5 +13,4 @@ func Example() {
 func ExampleFoo() {
 	example.Foo()
 	// Output:
-	// <null>
 }
