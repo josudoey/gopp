@@ -27,5 +27,7 @@ _testmain.go
 *.swp
 *.*
 !*.go
+!*.c
+!*.h
 !*.txt
 !*.html
