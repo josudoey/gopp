@@ -1,6 +1,17 @@
 // This is godoc example.
 package example
 
-// The foo is empty function.
-func foo() {
+import (
+	"fmt"
+)
+
+// Foo is empty function.
+func Foo() {
+
+}
+
+// Hello is "hello world" function.
+func Hello() {
+	msg := "Hello, 世界"
+	fmt.Println(msg)
 }
