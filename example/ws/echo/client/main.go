@@ -9,7 +9,7 @@ import (
 )
 
 var origin = "http://localhost/"
-var url = "ws://echo.websocket.org/"
+var url = "ws://localhost:8080/"
 
 func main() {
 	ws, err := websocket.Dial(url, "", origin)
