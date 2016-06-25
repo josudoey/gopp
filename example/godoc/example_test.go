@@ -10,8 +10,8 @@ func Example() {
 	// Hello, 世界
 }
 
-func ExampleExample_Foo() {
+func ExampleFoo() {
 	example.Foo()
 	// Output:
-	//
+	// <null>
 }
