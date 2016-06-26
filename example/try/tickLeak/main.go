@@ -26,4 +26,7 @@ func main() {
 	_ = <-done
 	runtime.ReadMemStats(&mem)
 	fmt.Printf("%-10v %-15v %-15v %-15v %-15v %-15v\n", time.Now().UnixNano()-t0, i, mem.Alloc, mem.TotalAlloc, mem.HeapAlloc, mem.HeapSys)
+	runtime.GC()
+	runtime.ReadMemStats(&mem)
+	fmt.Printf("%-10v %-15v %-15v %-15v %-15v %-15v\n", time.Now().UnixNano()-t0, "After GC", mem.Alloc, mem.TotalAlloc, mem.HeapAlloc, mem.HeapSys)
 }
