@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package gorpc;
+
+option go_package = "github.com/josudoey/gopp/gorpc";
+
+service ExampleService {
+    rpc Echo(EchoRequest) returns (EchoResponse);
+}
+
+message EchoRequest {
+    string message = 1;
+}
+
+message EchoResponse {
+    string message = 1;
+}
