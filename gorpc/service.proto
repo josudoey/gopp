@@ -6,6 +6,7 @@ option go_package = "github.com/josudoey/gopp/gorpc";
 
 service ExampleService {
     rpc Echo(EchoRequest) returns (EchoResponse);
+    rpc EchoStream(EchoRequest) returns (stream EchoResponse);
 }
 
 message EchoRequest {

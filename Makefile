@@ -18,11 +18,12 @@ clean:
 	rm bin/protoc-gen-grpcadapter
 
 .PHONY: gorpc
-gorpc: bin/protoc bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpcadapter
+gorpc: bin/protoc bin/protoc-gen-go bin/protoc-gen-go-grpc bin/protoc-gen-grpcadapter bin/protoc-gen-grpcadapter
 	./bin/protoc \
 		-I=. \
 		--go_out=paths=source_relative:. \
 		--go-grpc_out=require_unimplemented_servers=false,paths=source_relative:. \
+		--grpcadapter_out=paths=source_relative:. \
 		./gorpc/*.proto
 
 .PHONY: wire
@@ -39,6 +40,9 @@ bin/protoc-gen-go:
 # see https://github.com/grpc/grpc-go/tree/master/cmd/protoc-gen-go-grpc
 bin/protoc-gen-go-grpc:
 	GOBIN=$(abspath bin) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+bin/protoc-gen-grpcadapter:
+	GOBIN=$(abspath bin) go install github.com/josudoey/gopp/protoc-gen-grpcadapter
 
 bin/protoc-$(protoc_version).zip:
 	mkdir -p $(dir $@)
