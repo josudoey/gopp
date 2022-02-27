@@ -4,9 +4,9 @@ package gorpc;
 
 option go_package = "github.com/josudoey/gopp/gorpc";
 
-service ExampleService {
+service Example {
     rpc Echo(EchoRequest) returns (EchoResponse);
-    rpc EchoStream(EchoRequest) returns (stream EchoResponse);
+    rpc EchoStream(stream EchoRequest) returns (stream EchoResponse);
 }
 
 message EchoRequest {

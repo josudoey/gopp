@@ -18,56 +18,55 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ExampleServiceClient is the client API for ExampleService service.
+// ExampleClient is the client API for Example service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ExampleServiceClient interface {
+type ExampleClient interface {
 	Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error)
-	EchoStream(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (ExampleService_EchoStreamClient, error)
+	EchoStream(ctx context.Context, opts ...grpc.CallOption) (Example_EchoStreamClient, error)
 }
 
-type exampleServiceClient struct {
+type exampleClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewExampleServiceClient(cc grpc.ClientConnInterface) ExampleServiceClient {
-	return &exampleServiceClient{cc}
+func NewExampleClient(cc grpc.ClientConnInterface) ExampleClient {
+	return &exampleClient{cc}
 }
 
-func (c *exampleServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error) {
+func (c *exampleClient) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error) {
 	out := new(EchoResponse)
-	err := c.cc.Invoke(ctx, "/gorpc.ExampleService/Echo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gorpc.Example/Echo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *exampleServiceClient) EchoStream(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (ExampleService_EchoStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ExampleService_ServiceDesc.Streams[0], "/gorpc.ExampleService/EchoStream", opts...)
+func (c *exampleClient) EchoStream(ctx context.Context, opts ...grpc.CallOption) (Example_EchoStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Example_ServiceDesc.Streams[0], "/gorpc.Example/EchoStream", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &exampleServiceEchoStreamClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
+	x := &exampleEchoStreamClient{stream}
 	return x, nil
 }
 
-type ExampleService_EchoStreamClient interface {
+type Example_EchoStreamClient interface {
+	Send(*EchoRequest) error
 	Recv() (*EchoResponse, error)
 	grpc.ClientStream
 }
 
-type exampleServiceEchoStreamClient struct {
+type exampleEchoStreamClient struct {
 	grpc.ClientStream
 }
 
-func (x *exampleServiceEchoStreamClient) Recv() (*EchoResponse, error) {
+func (x *exampleEchoStreamClient) Send(m *EchoRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *exampleEchoStreamClient) Recv() (*EchoResponse, error) {
 	m := new(EchoResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -75,92 +74,98 @@ func (x *exampleServiceEchoStreamClient) Recv() (*EchoResponse, error) {
 	return m, nil
 }
 
-// ExampleServiceServer is the server API for ExampleService service.
-// All implementations should embed UnimplementedExampleServiceServer
+// ExampleServer is the server API for Example service.
+// All implementations should embed UnimplementedExampleServer
 // for forward compatibility
-type ExampleServiceServer interface {
+type ExampleServer interface {
 	Echo(context.Context, *EchoRequest) (*EchoResponse, error)
-	EchoStream(*EchoRequest, ExampleService_EchoStreamServer) error
+	EchoStream(Example_EchoStreamServer) error
 }
 
-// UnimplementedExampleServiceServer should be embedded to have forward compatible implementations.
-type UnimplementedExampleServiceServer struct {
+// UnimplementedExampleServer should be embedded to have forward compatible implementations.
+type UnimplementedExampleServer struct {
 }
 
-func (UnimplementedExampleServiceServer) Echo(context.Context, *EchoRequest) (*EchoResponse, error) {
+func (UnimplementedExampleServer) Echo(context.Context, *EchoRequest) (*EchoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Echo not implemented")
 }
-func (UnimplementedExampleServiceServer) EchoStream(*EchoRequest, ExampleService_EchoStreamServer) error {
+func (UnimplementedExampleServer) EchoStream(Example_EchoStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method EchoStream not implemented")
 }
 
-// UnsafeExampleServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ExampleServiceServer will
+// UnsafeExampleServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ExampleServer will
 // result in compilation errors.
-type UnsafeExampleServiceServer interface {
-	mustEmbedUnimplementedExampleServiceServer()
+type UnsafeExampleServer interface {
+	mustEmbedUnimplementedExampleServer()
 }
 
-func RegisterExampleServiceServer(s grpc.ServiceRegistrar, srv ExampleServiceServer) {
-	s.RegisterService(&ExampleService_ServiceDesc, srv)
+func RegisterExampleServer(s grpc.ServiceRegistrar, srv ExampleServer) {
+	s.RegisterService(&Example_ServiceDesc, srv)
 }
 
-func _ExampleService_Echo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Example_Echo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EchoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ExampleServiceServer).Echo(ctx, in)
+		return srv.(ExampleServer).Echo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gorpc.ExampleService/Echo",
+		FullMethod: "/gorpc.Example/Echo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExampleServiceServer).Echo(ctx, req.(*EchoRequest))
+		return srv.(ExampleServer).Echo(ctx, req.(*EchoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ExampleService_EchoStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(EchoRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(ExampleServiceServer).EchoStream(m, &exampleServiceEchoStreamServer{stream})
+func _Example_EchoStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ExampleServer).EchoStream(&exampleEchoStreamServer{stream})
 }
 
-type ExampleService_EchoStreamServer interface {
+type Example_EchoStreamServer interface {
 	Send(*EchoResponse) error
+	Recv() (*EchoRequest, error)
 	grpc.ServerStream
 }
 
-type exampleServiceEchoStreamServer struct {
+type exampleEchoStreamServer struct {
 	grpc.ServerStream
 }
 
-func (x *exampleServiceEchoStreamServer) Send(m *EchoResponse) error {
+func (x *exampleEchoStreamServer) Send(m *EchoResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-// ExampleService_ServiceDesc is the grpc.ServiceDesc for ExampleService service.
+func (x *exampleEchoStreamServer) Recv() (*EchoRequest, error) {
+	m := new(EchoRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// Example_ServiceDesc is the grpc.ServiceDesc for Example service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ExampleService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "gorpc.ExampleService",
-	HandlerType: (*ExampleServiceServer)(nil),
+var Example_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "gorpc.Example",
+	HandlerType: (*ExampleServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Echo",
-			Handler:    _ExampleService_Echo_Handler,
+			Handler:    _Example_Echo_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "EchoStream",
-			Handler:       _ExampleService_EchoStream_Handler,
+			Handler:       _Example_EchoStream_Handler,
 			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "gorpc/service.proto",

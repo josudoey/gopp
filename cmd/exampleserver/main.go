@@ -3,6 +3,7 @@ package exampleserver
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net"
 
@@ -29,19 +30,35 @@ func NewOptions() *Options {
 }
 
 var (
-	_ gorpc.ExampleServiceServer = (*server)(nil)
+	_ gorpc.ExampleServer = (*server)(nil)
 )
 
 // server is used to implement ExampleServiceServer
 type server struct {
-	gorpc.UnimplementedExampleServiceServer
+	gorpc.UnimplementedExampleServer
 }
 
-// SayHello implements gorpc.ExampleServiceServer
+// Echo implements gorpc.ExampleServiceServer
 func (s *server) Echo(ctx context.Context, req *gorpc.EchoRequest) (*gorpc.EchoResponse, error) {
 	return &gorpc.EchoResponse{
 		Message: req.GetMessage(),
 	}, nil
+}
+
+func (s *server) EchoStream(stream gorpc.Example_EchoStreamServer) error {
+	// see https://github.com/grpc/grpc-go/blob/master/examples/route_guide/server/server.go#L92
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		stream.Send(&gorpc.EchoResponse{
+			Message: req.Message,
+		})
+	}
 }
 
 // see https://github.com/grpc/grpc-go/blob/master/examples/helloworld/greeter_server/main.go
@@ -49,7 +66,7 @@ func (s *server) Echo(ctx context.Context, req *gorpc.EchoRequest) (*gorpc.EchoR
 func NewCommand() *cobra.Command {
 	o := NewOptions()
 	cmd := &cobra.Command{
-		Use:   "server",
+		Use:   "example-server",
 		Short: "run example server",
 		Run: func(cmd *cobra.Command, _ []string) {
 			lis, err := net.Listen("tcp", fmt.Sprintf(":%d", o.port))
@@ -57,7 +74,7 @@ func NewCommand() *cobra.Command {
 				log.Fatalf("failed to listen: %v", err)
 			}
 			s := grpc.NewServer()
-			gorpc.RegisterExampleServiceServer(s, &server{})
+			gorpc.RegisterExampleServer(s, &server{})
 			log.Printf("server listening at %v", lis.Addr())
 			if err := s.Serve(lis); err != nil {
 				log.Fatalf("failed to serve: %v", err)

@@ -10,23 +10,23 @@ import (
 	status "google.golang.org/grpc/status"
 )
 
-// ExampleServiceAdapter is the server API for ExampleService service.
+// ExampleAdapter is the server API for Example service.
 // for forward compatibility
-type ExampleServiceAdapter struct {
-	srv ExampleServiceServer
+type ExampleAdapter struct {
+	srv ExampleServer
 	cc  grpc.ClientConnInterface
 }
 
-func NewExampleServiceAdapter(srv ExampleServiceServer) ExampleServiceClient {
-	return &ExampleServiceAdapter{
+func NewExampleAdapter(srv ExampleServer) ExampleClient {
+	return &ExampleAdapter{
 		srv: srv,
 	}
 }
 
-func (a *ExampleServiceAdapter) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error) {
+func (a *ExampleAdapter) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error) {
 	return a.srv.Echo(ctx, in)
 }
 
-func (a *ExampleServiceAdapter) EchoStream(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (ExampleService_EchoStreamClient, error) {
+func (a *ExampleAdapter) EchoStream(ctx context.Context, opts ...grpc.CallOption) (Example_EchoStreamClient, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EchoStream not implemented")
 }
