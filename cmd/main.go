@@ -15,6 +15,8 @@ func newCommand() *cobra.Command {
 			// see https://github.com/spf13/cobra/blob/9054739e08187aab9294b7a773d54c92fabc23d3/completions.go#L599
 			DisableDefaultCmd: true,
 		},
+		SilenceErrors: true,
+		SilenceUsage:  true,
 	}
 	root.AddCommand(exampleserver.NewCommand())
 	root.AddCommand(exampleclient.NewCommand())

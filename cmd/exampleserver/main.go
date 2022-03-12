@@ -47,17 +47,25 @@ func (s *server) Echo(ctx context.Context, req *gorpc.EchoRequest) (*gorpc.EchoR
 
 func (s *server) EchoStream(stream gorpc.Example_EchoStreamServer) error {
 	// see https://github.com/grpc/grpc-go/blob/master/examples/route_guide/server/server.go#L92
+	msgCount := 0
 	for {
 		req, err := stream.Recv()
-		if err == io.EOF {
-			return nil
-		}
 		if err != nil {
+			if err == io.EOF {
+				log.Printf("recv EOF")
+				return nil
+			}
+			log.Printf("recv error %v", err)
 			return err
 		}
-		stream.Send(&gorpc.EchoResponse{
+		msgCount++
+		log.Printf("recv(%v) %v", msgCount, req.Message)
+		if err := stream.Send(&gorpc.EchoResponse{
 			Message: req.Message,
-		})
+		}); err != nil {
+			log.Printf("send error %v", err)
+			return err
+		}
 	}
 }
 
